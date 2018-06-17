@@ -8,6 +8,7 @@ class ShapeIndex(object):
 
     def __init__(self):
         self.index = rtree.index.Index()
+        self.n_shapes = 0
 
     def add_geojson(self, path_to_geojson):
         with fiona.drivers():
@@ -19,6 +20,7 @@ class ShapeIndex(object):
                         shape.bounds,
                         obj = shape
                     )
+                    self.n_shapes += 1
 
     def lookup(self, x, y):
         results = list(self.index.intersection((x, y), objects = True))
