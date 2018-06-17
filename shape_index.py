@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import fiona
+import gzip
+import json
 import rtree
 import shapely.geometry
 
@@ -10,19 +11,19 @@ class ShapeIndex(object):
         self.index = rtree.index.Index()
         self.n_shapes = 0
 
-    def add_geojson(self, path_to_geojson):
-        with fiona.drivers():
-            with fiona.open(path_to_geojson) as source:
-                for shape_record in source:
-                    shape = shapely.geometry.shape(shape_record["geometry"])
-                    self.index.insert(
-                        int(shape_record["properties"]["geoid"]),
-                        shape.bounds,
-                        obj = shape
-                    )
-                    self.n_shapes += 1
+    def add_geojson(self, path_to_geojson_gz):
+        with gzip.open(path_to_geojson_gz, "r") as f:
+            data = json.load(f)
+            for shape_record in data["features"]:
+                shape = shapely.geometry.shape(shape_record["geometry"])
+                self.index.insert(
+                    int(shape_record["properties"]["geoid"]),
+                    shape.bounds,
+                    obj = shape
+                )
+                self.n_shapes += 1
 
-    def lookup(self, x, y):
+    def lookup_geoid(self, x, y):
         results = list(self.index.intersection((x, y), objects = True))
         if (len(results) == 1):
             return results[0].id
