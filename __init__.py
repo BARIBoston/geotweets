@@ -13,10 +13,10 @@ shapes_dir = os.path.join(
     "shapes"
 )
 
-for geojson_gz in os.listdir(shapes_dir):
+for geojson in os.listdir(shapes_dir):
     index = ShapeIndex()
-    index.add_geojson(os.path.join(shapes_dir, geojson_gz))
-    indices[".".join(geojson_gz.split(".")[:-2])] = index
+    index.add_geojson(os.path.join(shapes_dir, geojson))
+    indices[".".join(geojson.split(".")[:-1])] = index
 
 def list_indices():
     print("\n".join([
